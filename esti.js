@@ -14,6 +14,16 @@ function parseResponse(data) {
 	return r;
 }
 
+function generateMacAddress() {
+    var macAddress = new Array(6);
+	macAddress[0] = Math.floor(Math.random() * (256 - 192 + 1)) + 192; //first part starting with two '1' bits
+    for (var i = 1; i < 6; i++) {
+        macAddress[i] = Math.floor(Math.random() * (256))
+    }
+
+    return macAddress;
+}
+
 
 serial.on("open", function () {
 	console.log('Serial port open');

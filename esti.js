@@ -21,6 +21,52 @@ function parseResponse(data) {
 	return r;
 }
 
+function buildAdvertisementBuffer(advertiser, localName) {
+	
+	var mac = generateMacAddress();
+	
+	var adv = {
+
+		start: 			[START_BYTE],
+
+		header: 		[advertiser + 3,											//Register ID: Genertic advertiser 0 - advertising data			
+				  		0x42],														//PDU header byte 0: non connectable undirected advertising
+						
+		packageLength: 	[0x0C + localName.length,									//BLE PDU header byte 1: length in bytes excluding ESCAPE_BYTE
+						0x00],														//BLE PDU header byte 2: Allways zero
+
+		mac : 			[mac[5], mac[4], mac[3], mac[2], mac[1], mac[0] ], 			//MAC address
+
+		tcFlag : 		[0x02, 														//Field length 2 bytes	
+						0x01, 														//Field type Flags
+						0x04,],														//Field Value: BR/EDR not supported
+
+		payloadLength :	[localName.length + 2,		 								//Length of data including flags and payload but excluding ESCAPE_BYTEs
+						0x09],														//Field type: Complete Local Name
+
+		payload: 		[],									
+
+		stop:			[STOP_BYTE]
+	}
+	
+	for (i = 0; i < localName.length; i++) {
+		var code = localName[i].charCodeAt(0);
+
+		if(code == START_BYTE || code == ESCAPE_BYTE || code == STOP_BYTE) {
+			adv.payload.push("\\".charCodeAt(0));
+		}
+			 
+    		adv.payload.push(localName[i].charCodeAt(0));
+	}
+
+	adv.payload.push(0x00); // string end
+
+		
+	//create buffer BLE package.
+	var buf = adv.start.concat(adv.header, adv.packageLength, adv.mac, adv.tcFlag, adv.payloadLength, adv.payload, adv.stop);
+	return new Buffer(buf);
+}
+
 function generateMacAddress() {
     var macAddress = new Array(6);
 	macAddress[0] = Math.floor(Math.random() * (256 - 192 + 1)) + 192; //first part starting with two '1' bits
@@ -46,7 +92,7 @@ serial.on("open", function () {
 	var power = new Buffer(START_BYTE, GA0 + 1, 0x04, STOP_BYTE);
 	var interval = new Buffer(START_BYTE, GA0 + 2, 0x20, 0x03, STOP_BYTE);
 
-	var message = new Buffer(START_BYTE, GAO + 3,0x42,0x10,0x00,0x00,0xBB,0xBB,0xBB,0xBB,0xAE,0x02,0x01,0x04,0x06,0x09,0x45,0x6C,0x76,0x69,0x00,STOP_BYTE);
+	var message = buildAdvertisementBuffer(GA0,"test");
 
 	writeBuffer(message);
 });

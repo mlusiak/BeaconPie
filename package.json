@@ -1,0 +1,34 @@
+{
+  "name": "beacon-pie",
+  "version": "0.0.1",
+  "description": "Simple module that helps you talk to Estimote Location Beacons over UART from Raspberry Pi",
+  "main": "index.js",
+  "dependencies": {
+    "serialport": "^3.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mlusiak/BeaconPie.git"
+  },
+  "keywords": [
+    "estimote",
+    "beacon",
+    "ibeacon",
+    "raspberry-pi",
+    "uart"
+  ],
+  "author": "Michał Łusiak <mlusiak@gmail.com> (http://mlusiak.com/)",
+  "contributors": [{
+    "name": "Karl-Henrik Nilsson",
+    "email": "karl-henrik@mean.se"
+  }],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mlusiak/BeaconPie/issues"
+  },
+  "homepage": "https://github.com/mlusiak/BeaconPie#readme"
+}

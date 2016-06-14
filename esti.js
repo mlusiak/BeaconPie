@@ -21,6 +21,32 @@ function parseResponse(data) {
 	return r;
 }
 
+function generateMacAddress() {
+    var macAddress = new Array(6);
+	macAddress[0] = Math.floor(Math.random() * (256 - 192 + 1)) + 192; //first part starting with two '1' bits
+    for (var i = 1; i < 6; i++) {
+        macAddress[i] = Math.floor(Math.random() * (256))
+    }
+
+    return macAddress;
+}
+
+function buildEnableBuffer(advertiser) {
+	return new Buffer([START_BYTE, advertiser, 0x01, STOP_BYTE]);
+}
+
+function buildPowerBuffer(advertiser, powerLevel) {
+	//TODO add validation / fixing - only predefined power levels are allowed
+	
+	return new Buffer([START_BYTE, advertiser + 1, powerLevel, STOP_BYTE]);
+}
+
+function buildIntervalBuffer(advertiser, interval) {
+	//TODO change interval int into LSB-encoded two-bytes
+	
+	return new Buffer([START_BYTE, advertiser + 2, 0x20, 0x03, STOP_BYTE]);
+}
+
 function buildAdvertisementBuffer(advertiser, localName) {
 	
 	var mac = generateMacAddress();
@@ -56,25 +82,23 @@ function buildAdvertisementBuffer(advertiser, localName) {
 			adv.payload.push("\\".charCodeAt(0));
 		}
 			 
-    		adv.payload.push(localName[i].charCodeAt(0));
+    	adv.payload.push(localName[i].charCodeAt(0));
 	}
 
 	adv.payload.push(0x00); // string end
 
-		
 	//create buffer BLE package.
 	var buf = adv.start.concat(adv.header, adv.packageLength, adv.mac, adv.tcFlag, adv.payloadLength, adv.payload, adv.stop);
 	return new Buffer(buf);
 }
 
-function generateMacAddress() {
-    var macAddress = new Array(6);
-	macAddress[0] = Math.floor(Math.random() * (256 - 192 + 1)) + 192; //first part starting with two '1' bits
-    for (var i = 1; i < 6; i++) {
-        macAddress[i] = Math.floor(Math.random() * (256))
-    }
 
-    return macAddress;
+
+function setAdvertisingPackage(advertiser, powerLevel, interval, localName) {
+	writeBuffer(buildEnableBuffer(advertiser));
+	writeBuffer(buildPowerBuffer(advertiser, powerLevel));
+	writeBuffer(buildIntervalBuffer(advertiser, interval));
+	writeBuffer(buildAdvertisementBuffer(advertiser, localName));
 }
 
 writeBuffer = function(buffer) {  

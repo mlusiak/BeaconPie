@@ -1,17 +1,16 @@
 var constants = require('./lib/constants');
-var ble = require('./lib/bluetooth');
-var uart = require('./lib/uart')
+var uart = require('./lib/uart');
 
 var SerialPort = require('serialport').SerialPort;
 var serial = new SerialPort("/dev/ttyS0", {baudRate:"115200", parity:"none"});
 
+serial.on("open", function () {
+	console.log('Serial port open');
+});
 
-function setAdvertisingPackage(advertiser, powerLevel, interval, localName) {
-	writeBuffer(uart.buildEnableBuffer(advertiser));
-	writeBuffer(uart.buildPowerBuffer(advertiser, powerLevel));
-	writeBuffer(uart.buildIntervalBuffer(advertiser, interval));
-	writeBuffer(uart.buildAdvertisementBuffer(advertiser, localName));
-}
+serial.on('data', function(data) {
+	console.log('Received data: ' + uart.parseResponse(data));
+}); 
 
 writeBuffer = function(buffer) {  
 	serial.write(buffer, function(error, result) {
@@ -20,11 +19,39 @@ writeBuffer = function(buffer) {
 	});
 }
 
-serial.on("open", function () {
-	console.log('Serial port open');
-	setAdvertisingPackage(constants.GA0, 0x04, 800, "Test");
-});
 
-serial.on('data', function(data) {
-	console.log('Response: ' + uart.parseResponse(data));
-}); 
+
+module.exports = {
+	enableAdvertiser:enableAdvertiser,
+	setBroadcastingPower:setBroadcastingPower,
+	setBroadcastingInterval:setBroadcastingInterval,
+	setLocalName:setLocalName,
+	setAdvertisingPacket:setAdvertisingPacket
+}
+
+function enableAdvertiser(advertiser) {
+	var register = uart.getRegister(advertiser);
+	writeBuffer(uart.buildEnableBuffer(register));
+}
+
+function setBroadcastingPower(advertiser, powerLevel) {
+	var register = uart.getRegister(advertiser);
+	writeBuffer(uart.buildPowerBuffer(register, powerLevel));
+}
+
+function setBroadcastingInterval(advertiser, interval) {
+	var register = uart.getRegister(advertiser);
+	writeBuffer(uart.buildIntervalBuffer(register, interval));
+}
+
+function setLocalName (advertiser, localName) {
+	var register = uart.getRegister(advertiser);
+	writeBuffer(uart.buildAdvertisementBuffer(register, localName));
+}
+
+function setAdvertisingPacket(advertiser, powerLevel, interval, localName) {
+	enableAdvertiser(advertiser);
+	setBroadcastingPower(advertiser, powerLevel);
+	setBroadcastingInterval(advertiser, interval);
+	setLocalName(advertiser, localName);
+}

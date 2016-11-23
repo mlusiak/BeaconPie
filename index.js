@@ -2,7 +2,7 @@ var constants = require('./lib/constants');
 var uart = require('./lib/uart');
 
 var SerialPort = require('serialport').SerialPort;
-var serial = new SerialPort("/dev/ttyS0", {baudRate:"115200", parity:"none"});
+var serial = new SerialPort("/dev/ttyAMA0", {baudRate:"115200", parity:"none"});
 
 serial.on("open", function () {
 	console.log('Serial port open');

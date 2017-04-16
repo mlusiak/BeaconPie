@@ -1,7 +1,7 @@
 {
   "name": "beacon-pie",
   "description": "Simple module that helps you talk to Estimote Location Beacons over UART from Raspberry Pi",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "author": "Michał Łusiak <mlusiak@gmail.com>",
   "contributors": [
     "Karl-Henrik Nilsson <karl-henrik@mean.se>"

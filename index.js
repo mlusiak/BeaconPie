@@ -20,9 +20,9 @@ writeBuffer = function(buffer) {
 }
 
 
-
 module.exports = {
 	enableAdvertiser:enableAdvertiser,
+	disableAdvertiser:disableAdvertiser,
 	setBroadcastingPower:setBroadcastingPower,
 	setBroadcastingInterval:setBroadcastingInterval,
 	setLocalName:setLocalName,
@@ -32,6 +32,11 @@ module.exports = {
 function enableAdvertiser(advertiser) {
 	var register = uart.getRegister(advertiser);
 	writeBuffer(uart.buildEnableBuffer(register));
+}
+
+function disableAdvertiser(advertiser) {
+	var register = uart.getRegister(advertiser);
+	writeBuffer(uart.buildDisableBuffer(register));
 }
 
 function setBroadcastingPower(advertiser, powerLevel) {
